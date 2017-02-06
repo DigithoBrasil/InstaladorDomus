@@ -45,7 +45,7 @@ call:restaurardb "AGEHAB_ENDERECOS" "\\VESUVIO\DomusWeb_Bancos\Domus\Enderecos\P
 echo.&pause&goto:eof
 
 :clonar
-git clone http://tfs01:8080/tfs/DigithoBrasil/Solu%%C3%%A7%%C3%%B5es%%20em%%20Software/_git/%~1
+git clone https://digithobrasil.visualstudio.com/Projetos/_git/%~1
 rename %~1 %~2
 goto:eof
 

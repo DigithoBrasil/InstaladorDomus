@@ -80,22 +80,22 @@ function clonar_projetos {
 function criar_aplicacoes_no_iis {
   Write-Host "### Criando aplicações no IIS"
 
-  criar_aplicacao_no_iis "Administracao" "/Administracao" "Domus\Administracao\src\Domus.Administracao.WebApp"
+  criar_aplicacao_no_iis "Administracao" "/Administracao" "$($PWD)\Administracao\src\Domus.Administracao.WebApp"
 
-  criar_aplicacao_no_iis "Contemplados" "/Contemplados" "Domus\Contemplados\src\Domus.Contemplados.WebApp"
+  criar_aplicacao_no_iis "Contemplados" "/Contemplados" "$($PWD)\Contemplados\src\Domus.Contemplados.WebApp"
 
-  criar_aplicacao_no_iis "Seguranca" "/Seguranca" "Domus\Seguranca\src\Domus.Seguranca.WebApp"
+  criar_aplicacao_no_iis "Seguranca" "/Seguranca" "$($PWD)\Seguranca\src\Domus.Seguranca.WebApp"
 
-  criar_aplicacao_no_iis "Selecao" "/Selecao" "Domus\Selecao\src\Domus.Selecao.WebApp"
-  criar_aplicacao_no_iis "Selecao/api" "/Selecao/api" "Domus\Selecao\src\Domus.Selecao.WebApi"
+  criar_aplicacao_no_iis "Selecao" "/Selecao" "$($PWD)\Selecao\src\Domus.Selecao.WebApp"
+  criar_aplicacao_no_iis "Selecao/api" "/Selecao/api" "$($PWD)\Selecao\src\Domus.Selecao.WebApi"
 
-  criar_aplicacao_no_iis "Tramitacao" "/Tramitacao" "Domus\Tramitacao\src\Tramitacao.WebApp"
+  criar_aplicacao_no_iis "Tramitacao" "/Tramitacao" "$($PWD)\Tramitacao\src\Tramitacao.WebApp"
 
-  criar_aplicacao_no_iis "InscricaoWeb" "/InscricaoWeb" "Domus\Inscricao\src\Domus.Inscricao.InscricaoWeb.WebApp"
-  criar_aplicacao_no_iis "InscricaoOnline" "/InscricaoOnline" "Domus\Inscricao\src\Domus.Inscricao.InscricaoCompartilhada.WebApp"
+  criar_aplicacao_no_iis "InscricaoWeb" "/InscricaoWeb" "$($PWD)\Inscricao\src\Domus.Inscricao.InscricaoWeb.WebApp"
+  criar_aplicacao_no_iis "InscricaoOnline" "/InscricaoOnline" "$($PWD)\Inscricao\src\Domus.Inscricao.InscricaoCompartilhada.WebApp"
 
-  criar_aplicacao_no_iis "Enderecos" "/Enderecos" "Domus\Enderecos\src\Domus.Enderecos.ServicosDistribuidos"
-  criar_aplicacao_no_iis "Enderecos/api" "/Enderecos/api" "Domus\Enderecos\src\Domus.Enderecos.WebApi"
+  criar_aplicacao_no_iis "Enderecos" "/Enderecos" "$($PWD)\Enderecos\src\Domus.Enderecos.ServicosDistribuidos"
+  criar_aplicacao_no_iis "Enderecos/api" "/Enderecos/api" "$($PWD)\Enderecos\src\Domus.Enderecos.WebApi"
 }
 
 function iniciar_iis {
@@ -159,7 +159,7 @@ function iniciar {
   mkdir Domus -ErrorAction SilentlyContinue
   Set-Location Domus
 
-  # clonar_projetos
+  clonar_projetos
   criar_aplicacoes_no_iis
   iniciar_iis
   compilar_projetos

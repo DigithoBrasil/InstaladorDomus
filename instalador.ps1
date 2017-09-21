@@ -4,6 +4,7 @@ Write-Output "### Buscando ferramentas"
 $gitPath = (Get-ChildItem -Path "C:\" -Filter git.exe -Recurse -Depth 3 | Select-Object -First 1 | % { $_.FullName }).Replace("Program Files\", "PROGRA~1\")
 $appcmdPath = "C:\Windows\system32\inetsrv\appcmd.exe"
 $msbuildPath = (Get-ChildItem -Path "C:\" -Filter msbuild.exe -Recurse -Depth 4 | Where-Object {$_.FullName -match "14.0\\Bin"} | Select-Object -First 1 | % { $_.FullName }).Replace("Program Files\", "PROGRA~1\").Replace("Program Files (x86)\", "PROGRA~2\")
+$sqlCmdPath = (Get-ChildItem -Path "C:\" -Filter sqlcmd.exe -Recurse -Depth 5 | Select-Object -First 1 | % { $_.FullName }).Replace("Program Files\", "PROGRA~1\")
 
 function clonar {
   param(
@@ -45,24 +46,24 @@ function restaurar_banco_de_dados {
 
   $pathDoBakCopiado = "$($PWD)\$($bakMaisRecente.Name)"
   
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'$($nomeDoBanco)' DROP DATABASE [$($nomeDoBanco)]`""
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"CREATE DATABASE $($nomeDoBanco) ON (NAME = $($nomeDoBanco)_dat, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf') LOG ON (NAME = $($nomeDoBanco)_log, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).ldf')`""
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"GO`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'$($nomeDoBanco)' DROP DATABASE [$($nomeDoBanco)]`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"CREATE DATABASE $($nomeDoBanco) ON (NAME = $($nomeDoBanco)_dat, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf') LOG ON (NAME = $($nomeDoBanco)_log, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).ldf')`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"GO`""
 
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"use [master]`""
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"ALTER DATABASE $($nomeDoBanco) SET SINGLE_USER WITH ROLLBACK IMMEDIATE`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"use [master]`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"ALTER DATABASE $($nomeDoBanco) SET SINGLE_USER WITH ROLLBACK IMMEDIATE`""
 
   # TODO: Entender (e arrumar aqui) porque o .bak do endereços é diferente e não tem mdf nem backup do log, fazendo com que o comando de restore seja diferente
   if ($nomeDoBanco -eq 'AGEHAB_enderecos') {
-    Invoke-Expression "sqlcmd -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 3,  NOUNLOAD,  REPLACE,  STATS = 5`""
+    Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 3,  NOUNLOAD,  REPLACE,  STATS = 5`""
   }
 
   else {
-    Invoke-Expression "sqlcmd -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 1,  MOVE N'$($nomeDoBanco)' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf',  MOVE N'$($nomeDoBanco)_log' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco)_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5`""
+    Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 1,  MOVE N'$($nomeDoBanco)' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf',  MOVE N'$($nomeDoBanco)_log' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco)_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5`""
   }
   
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"ALTER DATABASE [$($nomeDoBanco)] SET MULTI_USER`""
-  Invoke-Expression "sqlcmd -U sa -P sa -Q `"GO`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"ALTER DATABASE [$($nomeDoBanco)] SET MULTI_USER`""
+  Invoke-Expression "$($sqlCmdPath) -U sa -P sa -Q `"GO`""
 
   Remove-Item $pathDoBakCopiado
 }
@@ -175,12 +176,12 @@ function iniciar {
   mkdir Domus -ErrorAction SilentlyContinue
   Set-Location Domus
 
-  # clonar_projetos
-  # criar_aplicacoes_no_iis
-  # iniciar_iis
-  # compilar_projetos
-  # restaurar_bancos_de_dados
-  # migrar_projetos
+  clonar_projetos
+  criar_aplicacoes_no_iis
+  iniciar_iis
+  compilar_projetos
+  restaurar_bancos_de_dados
+  migrar_projetos
 
   Write-Host "Instalação finalizada"
 }

@@ -1,4 +1,6 @@
-﻿Write-Output "### Buscando ferramentas"
+﻿$pathDaInstalacao = "C:\ProjetosTFS";
+
+Write-Output "### Buscando ferramentas"
 $gitPath = (Get-ChildItem -Path "C:\" -Filter git.exe -Recurse -Depth 3 | Select-Object -First 1 | % { $_.FullName }).Replace("Program Files\", "PROGRA~1\")
 $appcmdPath = "C:\Windows\system32\inetsrv\appcmd.exe"
 $msbuildPath = (Get-ChildItem -Path "C:\" -Filter msbuild.exe -Recurse -Depth 4 | Where-Object {$_.FullName -match "14.0\\Bin"} | Select-Object -First 1 | % { $_.FullName }).Replace("Program Files\", "PROGRA~1\").Replace("Program Files (x86)\", "PROGRA~2\")
@@ -137,34 +139,50 @@ function migrar_projetos {
 }
 
 function validar_instalacao {
+  if (!(Test-Path $pathDaInstalacao)) {
+    Write-Error "O path informado ($($pathDaInstalacao)) para instalação não existe"
+    exit
+  }
+
   if (!(Test-Path $gitPath)) {
     Write-Error "cli do git não pôde ser encontrada, ele está instalado?"
+    exit
   }
 
   if (!(Test-Path $appCmdPath)) {
     Write-Error "cli do IIS não pôde ser encontrado, ele está instalado?"
+    exit
   }
 
   if (!(Test-Path $msbuildPath)) {
     Write-Error "cli da msbuild não pôde ser encontrada, ela está instalada?"
+    exit
   }
 }
 
 function iniciar {
+  $pathInformadoPeloUsuario = Read-Host -Prompt "Deseja instalar em qual diretório? (diretório padrão setado para $($pathDaInstalacao))"
+
+  if ($pathInformadoPeloUsuario) {
+    $pathDaInstalacao = $pathInformadoPeloUsuario
+  }
+
   Write-Output "### Validando instalação"
   validar_instalacao
 
   Write-Output "### Iniciando instalação"
-  Set-Location D:\ProjetosTFS\
+  Set-Location $pathDaInstalacao
   mkdir Domus -ErrorAction SilentlyContinue
   Set-Location Domus
 
-  clonar_projetos
-  criar_aplicacoes_no_iis
-  iniciar_iis
-  compilar_projetos
-  restaurar_bancos_de_dados
-  migrar_projetos
+  # clonar_projetos
+  # criar_aplicacoes_no_iis
+  # iniciar_iis
+  # compilar_projetos
+  # restaurar_bancos_de_dados
+  # migrar_projetos
+
+  Write-Host "Instalação finalizada"
 }
 
 iniciar

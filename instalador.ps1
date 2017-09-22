@@ -1,9 +1,14 @@
-﻿$pathDaInstalacao = "D:\ProjetosTFS";
+﻿# TODO: git path do endereços está errado
+# TODO: problema de build no segurança
+
+$pathDaInstalacao = "C:\ProjetosTFS";
 
 Write-Output "### Buscando ferramentas"
 $gitPath = (Get-ChildItem -Path "C:\" -Filter git.exe -Recurse -Depth 3 | Select-Object -First 1 | % { $_.FullName })
 $appcmdPath = "C:\Windows\system32\inetsrv\appcmd.exe"
 $msbuildPath = (Get-ChildItem -Path "C:\" -Filter msbuild.exe -Recurse -Depth 4 | Where-Object {$_.FullName -match "14.0\\Bin"} | Select-Object -First 1 | % { $_.FullName })
+
+$mssqlPath = (Get-ChildItem -Path "C:\" -Recurse -Depth 3 | Where-Object {$_.FullName -match "Microsoft SQL Server\\MSSQL"} | Select-Object -First 1 | % { $_.FullName })
 $sqlCmdPath = (Get-ChildItem -Path "C:\" -Filter sqlcmd.exe -Recurse -Depth 5 | Select-Object -First 1 | % { $_.FullName })
 
 function clonar {
@@ -47,7 +52,7 @@ function restaurar_banco_de_dados {
   $pathDoBakCopiado = "$($PWD)\$($bakMaisRecente.Name)"
   
   Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'$($nomeDoBanco)' DROP DATABASE [$($nomeDoBanco)]`""
-  Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"CREATE DATABASE $($nomeDoBanco) ON (NAME = $($nomeDoBanco)_dat, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf') LOG ON (NAME = $($nomeDoBanco)_log, FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).ldf')`""
+  Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"CREATE DATABASE $($nomeDoBanco) ON (NAME = $($nomeDoBanco)_dat, FILENAME = '$($mssqlPath)\MSSQL\DATA\$($nomeDoBanco).mdf') LOG ON (NAME = $($nomeDoBanco)_log, FILENAME = '$($mssqlPath)\MSSQL\DATA\$($nomeDoBanco).ldf')`""
   Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"GO`""
 
   Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"use [master]`""
@@ -55,11 +60,11 @@ function restaurar_banco_de_dados {
 
   # TODO: Entender (e arrumar aqui) porque o .bak do endereços é diferente e não tem mdf nem backup do log, fazendo com que o comando de restore seja diferente
   if ($nomeDoBanco -eq 'AGEHAB_enderecos') {
-    Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 3,  NOUNLOAD,  REPLACE,  STATS = 5`""
+    Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 1,  NOUNLOAD,  REPLACE,  STATS = 5`""
   }
 
   else {
-    Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 1,  MOVE N'$($nomeDoBanco)' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco).mdf',  MOVE N'$($nomeDoBanco)_log' TO N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\$($nomeDoBanco)_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5`""
+    Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"RESTORE DATABASE [$($nomeDoBanco)] FROM  DISK = N'$($pathDoBakCopiado)' WITH  FILE = 1,  MOVE N'$($nomeDoBanco)' TO N'$($mssqlPath)\MSSQL\DATA\$($nomeDoBanco).mdf',  MOVE N'$($nomeDoBanco)_log' TO N'$($mssqlPath)\MSSQL\DATA\$($nomeDoBanco)_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5`""
   }
   
   Invoke-Expression "& '$($sqlCmdPath)' -U sa -P sa -Q `"ALTER DATABASE [$($nomeDoBanco)] SET MULTI_USER`""
@@ -76,7 +81,7 @@ function clonar_projetos {
   clonar "Domus-Selecao" "Selecao"
   clonar "Domus-Tramitacao" "Tramitacao"
   clonar "Domus-Inscricao" "Inscricao"
-  clonar "Enderecos" "Enderecos"
+  clonar "Domus-Enderecos" "Enderecos"
   clonar "Domus-UI" "UI"
 }
 

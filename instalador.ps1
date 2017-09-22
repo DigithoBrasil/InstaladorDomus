@@ -11,6 +11,42 @@ $msbuildPath = (Get-ChildItem -Path "C:\" -Filter msbuild.exe -Recurse -Depth 4 
 $mssqlPath = (Get-ChildItem -Path "C:\" -Recurse -Depth 3 | Where-Object {$_.FullName -match "Microsoft SQL Server\\MSSQL"} | Select-Object -First 1 | % { $_.FullName })
 $sqlCmdPath = (Get-ChildItem -Path "C:\" -Filter sqlcmd.exe -Recurse -Depth 5 | Select-Object -First 1 | % { $_.FullName })
 
+function habilitar_features_do_windows {
+  Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-WebServerRole"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-WebServer"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-CommonHttpFeatures"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-HttpErrors"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-ApplicationDevelopment"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-NetFxExtensibility"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-NetFxExtensibility45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-HealthAndDiagnostics"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-HttpLogging"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-Security"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-RequestFiltering"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-Performance"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-WebServerManagementTools"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WAS-WindowsActivationService"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WAS-ProcessModel"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WAS-NetFxEnvironment"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WAS-ConfigurationAPI"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WCF-HTTP-Activation"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WCF-Services45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WCF-HTTP-Activation45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "WCF-TCP-PortSharing45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-StaticContent"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-DefaultDocument"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-DirectoryBrowsing"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-ASPNET45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-ISAPIExtensions"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-ISAPIFilter"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-HttpCompressionStatic"
+  Enable-WindowsOptionalFeature -Online -FeatureName "IIS-ManagementConsole"
+  Enable-WindowsOptionalFeature -Online -FeatureName "NetFx4-AdvSrvs"
+  Enable-WindowsOptionalFeature -Online -FeatureName "NetFx4Extended-ASPNET45"
+  Enable-WindowsOptionalFeature -Online -FeatureName "Microsoft-Windows-NetFx-VCRedist-Package"
+}
+
 function clonar {
   param(
     [string]$nomeDoProjeto,
@@ -172,6 +208,9 @@ function iniciar {
   if ($pathInformadoPeloUsuario) {
     $pathDaInstalacao = $pathInformadoPeloUsuario
   }
+
+  Write-Output "### Instalando features do windows"
+  habilitar_features_do_windows
 
   Write-Output "### Validando instalação"
   validar_instalacao

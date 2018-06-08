@@ -119,6 +119,7 @@ function clonar_projetos {
   clonar "Domus-Inscricao" "Inscricao"
   clonar "Domus-Enderecos" "Enderecos"
   clonar "Domus-UI" "UI"
+  clonar "Domus-Novo-Inscricao" "Domus-Novo-Inscricao"
 }
 
 function criar_aplicacoes_no_iis {
@@ -172,6 +173,7 @@ function restaurar_bancos_de_dados {
   restaurar_banco_de_dados "AGEHAB_SELECAO" "\\VESUVIO\DomusWeb_Bancos\Domus\Selecao\Producao"
   restaurar_banco_de_dados "AGEHAB_TRAMITACAO" "\\VESUVIO\DomusWeb_Bancos\Domus\Tramitacao\Producao"
   restaurar_banco_de_dados "AGEHAB_ENDERECOS" "\\VESUVIO\DomusWeb_Bancos\Domus\Enderecos\Producao"
+  restaurar_banco_de_dados "agehab_inscricao" "\\VESUVIO\DomusWeb_Bancos\Domus\InscricaoNovo\Producao"
 }
 
 function migrar_projetos {
